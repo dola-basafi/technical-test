@@ -16,6 +16,18 @@ class ArticleCategoryController extends Controller
             'message' => $data
         ]);
     }
+    function update(Request $request, $id)
+    {
+        if ($request->input('name')) {
+            ArticleCategory::find($id)->update([
+                'name' => $request->input('name')
+            ]);
+        }
+        return response()->json([
+            'status' => true,
+            'message' => "success update data"
+        ]);
+    }
     function store(Request $request)
     {
         $validator =  Validator::make(
@@ -44,9 +56,30 @@ class ArticleCategoryController extends Controller
     function show($id)
     {
         $data = ArticleCategory::find($id);
+        if ($data) {
+            return response()->json([
+                'status' => true,
+                'message' => $data
+            ]);
+        }
         return response()->json([
-            'status' => true,
-            'message' => $data
+            'status' => false,
+            'message' => 'data with this id is not found'
+        ]);
+    }
+    function destroy($id)
+    {
+        $delete = ArticleCategory::find($id);
+        if ($delete) {
+            $delete->delete();
+            return response()->json([
+                'status' => true,
+                'message' => 'success delete data'
+            ]);
+        }
+        return response()->json([
+            'status' => false,
+            'message' => 'data with this id is not found'
         ]);
     }
 }
