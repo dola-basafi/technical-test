@@ -58,7 +58,7 @@ class ArticleController extends Controller
 
     function index(Request $request)
     {       
-        $start = $request->query('page', 0);
+        $start = $request->query('page', 0) - 1;
         if ($start < 1 || !is_numeric($start)) {
             $start = 0;
         }
