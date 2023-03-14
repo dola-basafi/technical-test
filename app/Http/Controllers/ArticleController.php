@@ -73,12 +73,12 @@ class ArticleController extends Controller
 
     function show($id)
     {
-        $data = Article::join('articlecategories', 'articles.category_id', '=', 'articlecategories.id')
-        ->where('articlecategories.id')
-            ->get(['articles.*', 'articlecategories.categoryname']);
-            dd($data);
-        $data->media = "http://127.0.0.1:8000/" . $data->media;
-        $data->media = str_replace("/public/","/storage/",$data->media);
+        $data = DB::table('articles')
+        ->join('articlecategories', 'articles.category_id', '=',  'articlecategories.id')
+        ->where('articles.id',$id)
+        ->select('articles.*','articlecategories.categoryname') ->get();            
+        $data[0]->media = "http://127.0.0.1:8000/" . $data[0]->media;
+        $data[0]->media = str_replace("/public/","/storage/",$data[0]->media);
         return response()->json([
             'status' => false,
             'message' => $data
