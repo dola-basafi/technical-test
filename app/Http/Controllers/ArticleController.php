@@ -56,11 +56,17 @@ class ArticleController extends Controller
         ]);
     }
 
-    function index()
+    function index(Request $request)
     {       
+        $start = $request->query('page', 0);
+        if ($start < 1 || !is_numeric($start)) {
+            $start = 0;
+        }
+        $start = $start*5 ;
         $data = DB::table('articles')
                 ->join('articlecategories', 'articles.category_id', '=',  'articlecategories.id')
-                ->select('articles.*','articlecategories.categoryname') ->get();
+                ->select('articles.*','articlecategories.categoryname')
+                ->offset($start)->limit(5) ->get();
         foreach ($data as $key => $value) {            
             $data[$key]->media = "http://127.0.0.1:8000/" . $data[$key]->media;
             $data[$key]->media = str_replace("/public/","/storage/",$data[$key]->media);

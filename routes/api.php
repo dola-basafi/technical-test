@@ -29,7 +29,7 @@ Route::prefix('article-category')->group(function(){
 });
 
 Route::prefix('article')->group(function (){
-  Route::get('/list',[ArticleController::class,'index']);
+  Route::get('/{list}',[ArticleController::class,'index']);
   Route::get('/detail/{id}',[ArticleController::class,'show']);
   Route::post('/create',[ArticleController::class,'store']);
   Route::post('update/{id}',[ArticleController::class,'update']);

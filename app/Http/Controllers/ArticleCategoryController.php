@@ -4,13 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Models\ArticleCategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ArticleCategoryController extends Controller
 {
-    function index()
+    function index(Request $request)
     {
-        $data = ArticleCategory::all();
+        $start = $request->query('page', 0);
+        if ($start < 1 || !is_numeric($start)) {
+            $start = 0;
+        }
+        $start = $start*5 ;
+        $data = DB::table('articlecategories')->offset($start)->limit(5)->get();
         return response()->json([
             'status' => true,
             'message' => $data
