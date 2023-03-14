@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ArticleCategoryController;
+use App\Http\Controllers\ArticleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -27,3 +28,10 @@ Route::prefix('article-category')->group(function(){
   Route::delete('/delete/{id}',[ArticleCategoryController::class,'destroy']);
 });
 
+Route::prefix('article')->group(function (){
+  Route::get('/list',[ArticleController::class,'index']);
+  Route::get('/detail/{id}',[ArticleController::class,'show']);
+  Route::post('/create',[ArticleController::class,'store']);
+  Route::post('update/{id}',[ArticleController::class,'update']);
+  Route::delete('/delete/{id}',[ArticleController::class,'destroy']);
+});

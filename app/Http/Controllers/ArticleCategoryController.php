@@ -18,9 +18,9 @@ class ArticleCategoryController extends Controller
     }
     function update(Request $request, $id)
     {
-        if ($request->input('name')) {
+        if ($request->input('categoryname')) {
             ArticleCategory::find($id)->update([
-                'name' => $request->input('name')
+                'categoryname' => $request->input('categoryname')
             ]);
         }
         return response()->json([
@@ -33,7 +33,7 @@ class ArticleCategoryController extends Controller
         $validator =  Validator::make(
             $request->all(),
             [
-                'name' => ['required']
+                'categoryname' => ['required']
             ],
             [
                 'required' => ':attribute cannot empty'
@@ -46,7 +46,7 @@ class ArticleCategoryController extends Controller
             ], 400);
         }
         ArticleCategory::create([
-            'name' => $request->input('name')
+            'categoryname' => $request->input('categoryname')
         ]);
         return response()->json([
             'status' => true,
