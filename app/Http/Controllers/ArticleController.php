@@ -68,7 +68,7 @@ class ArticleController extends Controller
                 ->select('articles.*','articlecategories.categoryname')
                 ->offset($start)->limit(5) ->get();
         foreach ($data as $key => $value) {            
-            $data[$key]->media = "http://127.0.0.1:8000/" . $data[$key]->media;
+            $data[$key]->media = "https://technical-test-production.up.railway.app/" . $data[$key]->media;
             $data[$key]->media = str_replace("/public/","/storage/",$data[$key]->media);
         }
         return response()->json([
@@ -79,11 +79,17 @@ class ArticleController extends Controller
 
     function show($id)
     {
+        if (!Article::find($id)) {
+            return response()->json([
+                'status' => false,
+                'messages' => 'data with this id not found'
+            ]);
+        }
         $data = DB::table('articles')
         ->join('articlecategories', 'articles.category_id', '=',  'articlecategories.id')
         ->where('articles.id',$id)
         ->select('articles.*','articlecategories.categoryname') ->get();            
-        $data[0]->media = "http://127.0.0.1:8000/" . $data[0]->media;
+        $data[0]->media = "https://technical-test-production.up.railway.app/" . $data[0]->media;
         $data[0]->media = str_replace("/public/","/storage/",$data[0]->media);
         return response()->json([
             'status' => false,
