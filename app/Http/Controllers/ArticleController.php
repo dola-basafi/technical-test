@@ -41,7 +41,7 @@ class ArticleController extends Controller
                 'messages' => 'category with this id is not found'
             ]);
         }
-        $path = Storage::putFile('public/files', $request->file('media')); 
+        $path = $request->getSchemeAndHttpHost() . '/storage/' . $request->file('media')->store('files', 'public');
         Article::create([
             'title' => $request->input('title'),
             'description' => $request->input('description'),
@@ -55,27 +55,24 @@ class ArticleController extends Controller
     }
 
     function index(Request $request)
-    {       
+    {
         $start = $request->query('page', 0) - 1;
         if ($start < 1 || !is_numeric($start)) {
             $start = 0;
         }
-        $start = $start*5 ;
+        $start = $start * 5;
         $data = DB::table('articles')
-                ->join('articlecategories', 'articles.category_id', '=',  'articlecategories.id')
-                ->select('articles.*','articlecategories.categoryname')
-                ->offset($start)->limit(5) ->get();
-        foreach ($data as $key => $value) {            
-            $data[$key]->media = $request->getSchemeAndHttpHost() . $data[$key]->media;
-            $data[$key]->media = str_replace("public/","/storage/",$data[$key]->media);
-        }
+            ->join('articlecategories', 'articles.category_id', '=',  'articlecategories.id')
+            ->select('articles.*', 'articlecategories.categoryname')
+            ->offset($start)->limit(5)->get();
+       
         return response()->json([
             'status' => true,
             'message' => $data
         ]);
     }
 
-    function show(Request $request,$id)
+    function show(Request $request, $id)
     {
         if (!Article::find($id)) {
             return response()->json([
@@ -84,11 +81,10 @@ class ArticleController extends Controller
             ]);
         }
         $data = DB::table('articles')
-        ->join('articlecategories', 'articles.category_id', '=',  'articlecategories.id')
-        ->where('articles.id',$id)
-        ->select('articles.*','articlecategories.categoryname') ->get();            
-        $data[0]->media = $request->getSchemeAndHttpHost() . $data[0]->media;
-        $data[0]->media = str_replace("public/","/storage/",$data[0]->media);
+            ->join('articlecategories', 'articles.category_id', '=',  'articlecategories.id')
+            ->where('articles.id', $id)
+            ->select('articles.*', 'articlecategories.categoryname')->get();
+       
         return response()->json([
             'status' => false,
             'message' => $data
@@ -108,7 +104,7 @@ class ArticleController extends Controller
             $data->title = $request->input('title');
         }
         if ($request->input('descripton')) {
-           $data->description = $request->input('description');
+            $data->description = $request->input('description');
         }
         if ($request->input('category_id')) {
             $cekCategory = ArticleCategory::find($request->input('category_id'));
@@ -118,12 +114,13 @@ class ArticleController extends Controller
                     'messages' => 'category id is not found'
                 ]);
             }
-            $data->category_id = $request->input('category_id');            
+            $data->category_id = $request->input('category_id');
         }
-        if ($request->hasFile('media')){
-            Storage::delete($data->media);
-            $path = Storage::putFile('public/files',$request->file('media'));      
-            $data->media = $path;      
+        if ($request->hasFile('media')) {
+            $banner = str_replace($request->getSchemeAndHttpHost() . "/storage/", "", $data->media);
+            Storage::disk('public')->delete($banner);
+            $path = $request->getSchemeAndHttpHost() . '/storage/' . $request->file('media')->store('files', 'public');
+            $data->media = $path;
         }
         $data->update();
         return response()->json([
@@ -131,15 +128,17 @@ class ArticleController extends Controller
             'messages' => 'success update data'
         ]);
     }
-    function destroy($id){
+    function destroy(Request $request, $id)
+    {
         $dataDelete = Article::find($id);
         if (!$dataDelete) {
-                return response()->json([
-                    'status' => false,
-                    'messages' => "data with this id not found"
-                ]);
+            return response()->json([
+                'status' => false,
+                'messages' => "data with this id not found"
+            ]);
         }
-        Storage::delete($dataDelete->media);
+        $banner = str_replace($request->getSchemeAndHttpHost() . "/storage/", "", $dataDelete->media);
+        Storage::disk('public')->delete($banner);
         $dataDelete->delete();
         return response()->json([
             'status' => true,
