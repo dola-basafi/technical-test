@@ -11,11 +11,13 @@ class ArticleCategoryController extends Controller
 {
     function index(Request $request)
     {
+        //catch query string page
         $start = $request->query('page', 0) - 1;
         if ($start < 1 || !is_numeric($start)) {
             $start = 0;
         }
         $start = $start*5 ;
+        //make filter for each page, for 5 list per page
         $data = DB::table('articlecategories')->offset($start)->limit(5)->get();
         return response()->json([
             'status' => true,
@@ -24,7 +26,9 @@ class ArticleCategoryController extends Controller
     }
     function update(Request $request, $id)
     {
+        //check input categroyname is exist or not
         if ($request->input('categoryname')) {
+            //if exist replace old data wtih new one
             ArticleCategory::find($id)->update([
                 'categoryname' => $request->input('categoryname')
             ]);
@@ -36,6 +40,7 @@ class ArticleCategoryController extends Controller
     }
     function store(Request $request)
     {
+        //make validator for request input
         $validator =  Validator::make(
             $request->all(),
             [
@@ -45,12 +50,15 @@ class ArticleCategoryController extends Controller
                 'required' => ':attribute cannot empty'
             ]
         );
+        //if validator fail
         if ($validator->fails()) {
+            //if fail
             return response()->json([
                 'status' => false,
                 'message' => $validator->errors()
             ], 400);
         }
+        //if not fail create data
         ArticleCategory::create([
             'categoryname' => $request->input('categoryname')
         ]);
@@ -62,6 +70,7 @@ class ArticleCategoryController extends Controller
     function show($id)
     {
         $data = ArticleCategory::find($id);
+         //if category with id exist
         if ($data) {
             return response()->json([
                 'status' => true,
@@ -75,7 +84,9 @@ class ArticleCategoryController extends Controller
     }
     function destroy($id)
     {
+        //find category with id
         $delete = ArticleCategory::find($id);
+        //if category with id exist
         if ($delete) {
             $delete->delete();
             return response()->json([
@@ -83,6 +94,7 @@ class ArticleCategoryController extends Controller
                 'message' => 'success delete data'
             ]);
         }
+        //if category  not exist
         return response()->json([
             'status' => false,
             'message' => 'data with this id is not found'
